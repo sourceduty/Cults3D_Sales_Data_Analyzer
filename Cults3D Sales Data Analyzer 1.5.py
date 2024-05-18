@@ -1,9 +1,9 @@
-# Cults3D Sales Data Analyzer
+# Cults3D Sales Data Analyzer 1.5
 # Open Cults3D CSV sale data files, view the processed data, and export a detailed statistical report.
 # 🛈 This software is free and open-source; anyone can redistribute it and/or modify it.
 
-
 import pandas as pd
+import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from tkinter.scrolledtext import ScrolledText
@@ -48,6 +48,11 @@ def analyze_data(data):
     # Summary statistics
     summary_stats = data.describe()
 
+    # Calculate additional metrics
+    total_sales = data['Total including VAT EUR'].sum()
+    average_sales_per_transaction = data['Total including VAT EUR'].mean()
+    top_selling_design = data['Design'].mode()[0]
+
     # Sort data by Date and Total including VAT EUR
     data_sorted = data.sort_values(by=['Date', 'Total including VAT EUR'], ascending=[True, False])
 
@@ -66,9 +71,9 @@ def analyze_data(data):
         'Income EUR': 'sum'
     })
 
-    return summary_stats, data_sorted, grouped_by_user, grouped_by_country
+    return summary_stats, data_sorted, grouped_by_user, grouped_by_country, total_sales, average_sales_per_transaction, top_selling_design
 
-def generate_report(summary_stats, data_sorted, grouped_by_user, grouped_by_country):
+def generate_report(summary_stats, data_sorted, grouped_by_user, grouped_by_country, total_sales, average_sales_per_transaction, top_selling_design):
     # Create the statistics report
     report = f"""
 Sales Data Statistics Report
@@ -105,6 +110,10 @@ Income EUR:
 - Min: {summary_stats.loc['min', 'Income EUR']}
 - Max: {summary_stats.loc['max', 'Income EUR']}
 
+Total Sales: {total_sales}
+Average Sales per Transaction: {average_sales_per_transaction}
+Top Selling Design: {top_selling_design}
+
 Top Transaction:
 ----------------
 - Date: {data_sorted.iloc[0]['Date']}
@@ -139,7 +148,7 @@ class SalesDataApp:
         self.create_widgets()
 
     def create_widgets(self):
-        self.open_button = tk.Button(self.root, text="Open CSV", command=self.open_file)
+        self.open_button = tk.Button(self.root, text="Open Folder", command=self.open_folder)
         self.open_button.pack(pady=10)
 
         self.text_area = ScrolledText(self.root, wrap=tk.WORD, width=100, height=30)
@@ -148,25 +157,34 @@ class SalesDataApp:
         self.export_button = tk.Button(self.root, text="Export Report", command=self.export_report)
         self.export_button.pack(pady=10)
 
-    def open_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
-        if file_path:
-            self.data = load_and_clean_data(file_path)
+    def open_folder(self):
+        folder_path = filedialog.askdirectory()
+        if folder_path:
+            self.data = self.load_data_from_folder(folder_path)
             self.show_data()
+
+    def load_data_from_folder(self, folder_path):
+        data_frames = []
+        for file_name in os.listdir(folder_path):
+            if file_name.endswith('.csv'):
+                file_path = os.path.join(folder_path, file_name)
+                data_frames.append(load_and_clean_data(file_path))
+        combined_data = pd.concat(data_frames, ignore_index=True)
+        return combined_data
 
     def show_data(self):
         if self.data is not None:
             self.text_area.delete(1.0, tk.END)
-            summary_stats, data_sorted, grouped_by_user, grouped_by_country = analyze_data(self.data)
-            report = generate_report(summary_stats, data_sorted, grouped_by_user, grouped_by_country)
+            summary_stats, data_sorted, grouped_by_user, grouped_by_country, total_sales, average_sales_per_transaction, top_selling_design = analyze_data(self.data)
+            report = generate_report(summary_stats, data_sorted, grouped_by_user, grouped_by_country, total_sales, average_sales_per_transaction, top_selling_design)
             self.text_area.insert(tk.END, report)
 
     def export_report(self):
         if self.data is not None:
             output_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt")])
             if output_path:
-                summary_stats, data_sorted, grouped_by_user, grouped_by_country = analyze_data(self.data)
-                report = generate_report(summary_stats, data_sorted, grouped_by_user, grouped_by_country)
+                summary_stats, data_sorted, grouped_by_user, grouped_by_country, total_sales, average_sales_per_transaction, top_selling_design = analyze_data(self.data)
+                report = generate_report(summary_stats, data_sorted, grouped_by_user, grouped_by_country, total_sales, average_sales_per_transaction, top_selling_design)
                 save_report(report, output_path)
                 messagebox.showinfo("Export Report", f"Report successfully exported to {output_path}")
         else:
