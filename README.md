@@ -2,6 +2,8 @@
 
 > Open Cults3D CSV sale data files, view the processed data, and export a detailed statistical report.
 
+#
+
 The Cults3D Sales Data Analyzer is a Python application with a graphical user interface (GUI) built using the tkinter library. This application allows users to open CSV files, view the processed data, and export a detailed statistical report. The core functionality revolves around data cleaning, analysis, and report generation, which are facilitated by the pandas library for data manipulation.
 
 When the application is launched, it presents a simple GUI with buttons for opening CSV files and exporting reports, and a text area for displaying the analysis results. The user starts by clicking the "Open CSV" button, which triggers a file dialog to select a CSV file containing sales data. The selected file is then read into a pandas DataFrame, and any rows with all NaN values are removed. The application also fills missing values with appropriate defaults: zeros for numerical columns and empty strings for text columns. Additionally, it ensures that data types are correctly assigned to each column, such as converting date strings to datetime objects and numeric columns to appropriate numerical types.
