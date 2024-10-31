@@ -15,6 +15,9 @@ The results of this analysis are displayed in the text area of the GUI, formatte
 Overall, the Cults3D Sales Data Analyzer V1.5 provides a user-friendly interface for performing detailed analysis of sales data from multiple CSV files, making it accessible to users who may not be familiar with programming or data manipulation tools. By combining the capabilities of tkinter for the GUI and pandas for data processing, the application offers a robust solution for handling and interpreting large volumes of sales data, delivering valuable insights and facilitating informed decision-making.
 
 #
+![3D](https://github.com/user-attachments/assets/126cdb47-40c3-4703-adfe-19b4a524a513)
+
+#
 ### Example Report
 
 [Example Report.txt](https://github.com/sourceduty/Cults3D_Sales_Data_Analyzer/files/15366813/Example.Report.txt)
